@@ -447,6 +447,158 @@ body {
   text-align: right;
 }
 
+/* Vlados drinking game */
+.vlados-score {
+  position: absolute;
+  top: calc(12px + var(--safe-top));
+  left: 60px;
+  right: 200px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 6px 10px;
+  background: rgba(10, 6, 8, 0.78);
+  border: 1px solid rgba(244, 234, 213, 0.18);
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+}
+.vlados-score__side {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.vlados-score__who {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: rgba(244, 234, 213, 0.7);
+}
+.vlados-score__pips { display: inline-flex; gap: 3px; }
+.vlados-score__vs {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(244, 234, 213, 0.4);
+  font-weight: 700;
+}
+.pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(244, 234, 213, 0.35);
+}
+.pip--full { background: var(--accent); border-color: var(--accent); }
+.pip--half {
+  background: linear-gradient(90deg, var(--accent) 0 50%, transparent 50%);
+  border-color: rgba(244, 234, 213, 0.35);
+}
+.pip--empty { background: transparent; }
+
+.vlados-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.vlados-actions .btn { width: 100%; }
+.vlados-choice { letter-spacing: 0.12em; text-transform: uppercase; }
+
+.vlados-reveal[hidden] { display: none; }
+.vlados-reveal {
+  background: rgba(10, 6, 8, 0.65);
+  border: 1px solid rgba(244, 234, 213, 0.18);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.vlados-reveal__row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+}
+.vlados-reveal__side { text-align: center; }
+.vlados-reveal__who {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(244, 234, 213, 0.55);
+}
+.vlados-reveal__pick {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--fg);
+  margin-top: 2px;
+}
+.vlados-reveal__vs {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: rgba(244, 234, 213, 0.4);
+  font-weight: 700;
+}
+.vlados-reveal__outcome {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+.vlados-reveal__outcome--win { color: #9be28a; background: rgba(99, 200, 99, 0.12); }
+.vlados-reveal__outcome--loss { color: #ff7b6d; background: rgba(232, 49, 42, 0.18); }
+.vlados-reveal__outcome--tie { color: rgba(244, 234, 213, 0.7); background: rgba(244, 234, 213, 0.08); }
+
+.vlados-video {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.vlados-video[hidden] { display: none; }
+.vlados-video__el {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+.vlados-video__skip {
+  position: absolute;
+  right: 16px;
+  bottom: calc(16px + var(--safe-bottom));
+  z-index: 2;
+  padding: 10px 18px;
+  font-size: 14px;
+  background: rgba(10, 6, 8, 0.7);
+  border: 1px solid rgba(244, 234, 213, 0.25);
+  box-shadow: none;
+}
+
+/* Debt banner (Malyshka) */
+.debt {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(244, 234, 213, 0.65);
+  padding: 8px 12px;
+  border: 1px dashed rgba(244, 234, 213, 0.25);
+  border-radius: 10px;
+  text-align: center;
+}
+.debt__value {
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+}
+
 /* Menu (otec bar) */
 .menu {
   display: flex;
