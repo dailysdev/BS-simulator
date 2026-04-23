@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
+  />
+  <meta name="theme-color" content="#0a0608" />
+  <title>The Beer Station</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app" class="app"></div>
+  <div id="hud" class="hud" hidden aria-live="polite">
+    <div class="hud__stat" data-stat="health">
+      <span class="hud__label">HP</span>
+      <span class="hud__value" data-role="health">5</span>
+    </div>
+    <div class="hud__stat" data-stat="money">
+      <span class="hud__value" data-role="money">50</span>
+      <span class="hud__label">zł</span>
+    </div>
+    <div class="hud__stat" data-stat="mood">
+      <span class="hud__label">MOOD</span>
+      <span class="hud__value" data-role="mood">0</span>
+    </div>
+  </div>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
