@@ -6,6 +6,7 @@ const scenes = {
   splash: () => import("./scenes/splash.js"),
   bar: () => import("./scenes/bar.js"),
   "shkolnik-jokes": () => import("./scenes/shkolnik-jokes.js"),
+  "otec-bar": () => import("./scenes/otec-bar.js"),
   ending: () => import("./scenes/ending.js"),
 };
 

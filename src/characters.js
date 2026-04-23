@@ -4,6 +4,7 @@ export const characters = [
     name: "Отец",
     language: "ru",
     role: "Владелец бара",
+    action: "otec-bar",
     portrait: "references/charakters/otec/image.png",
     focus: "50% 30%",
   },

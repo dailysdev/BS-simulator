@@ -7,6 +7,7 @@ const defaultState = () => ({
   createdAt: Date.now(),
   updatedAt: Date.now(),
   stats: defaultStats(),
+  flags: {},
   ending: null,
   progress: {
     currentScene: "bar",
@@ -24,6 +25,7 @@ function load() {
     const parsed = JSON.parse(raw);
     if (parsed?.version !== 2) return null;
     if (!parsed.stats) parsed.stats = defaultStats();
+    if (!parsed.flags) parsed.flags = {};
     return parsed;
   } catch {
     return null;
@@ -90,6 +92,17 @@ export function changeHealth(n) {
 
 export function setEnding(id) {
   state.ending = id;
+  persist();
+  emit();
+}
+
+export function getFlag(key) {
+  return state.flags?.[key];
+}
+
+export function setFlag(key, value) {
+  state.flags = state.flags || {};
+  state.flags[key] = value;
   persist();
   emit();
 }
