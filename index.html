@@ -13,6 +13,20 @@
 </head>
 <body>
   <div id="app" class="app"></div>
+  <div id="hud" class="hud" hidden aria-live="polite">
+    <div class="hud__stat" data-stat="health">
+      <span class="hud__label">HP</span>
+      <span class="hud__value" data-role="health">5</span>
+    </div>
+    <div class="hud__stat" data-stat="money">
+      <span class="hud__value" data-role="money">50</span>
+      <span class="hud__label">zł</span>
+    </div>
+    <div class="hud__stat" data-stat="mood">
+      <span class="hud__label">MOOD</span>
+      <span class="hud__value" data-role="mood">0</span>
+    </div>
+  </div>
   <script type="module" src="src/main.js"></script>
 </body>
 </html>

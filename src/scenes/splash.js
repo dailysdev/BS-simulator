@@ -9,7 +9,7 @@ export function mount(root) {
   el.innerHTML = `
     <h1 class="splash__title">
       <span class="kicker">Welcome to</span>
-      <span class="main">The Beer<br/>Station</span>
+      <span class="main">Beer Station<br/>Simulator</span>
     </h1>
 
     <div class="splash__actions">

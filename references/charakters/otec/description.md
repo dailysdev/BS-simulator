@@ -1,4 +1,4 @@
 name: Отец
 language: Russina
-game:
+game: Бир понг
 role: Владелец бара

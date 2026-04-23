@@ -37,6 +37,7 @@ export const characters = [
     language: "ru",
     role: "Гость",
     game: "анекдоты",
+    action: "shkolnik-jokes",
     portrait: "references/charakters/shkolnik/scene.png",
     focus: "50% 26%",
   },

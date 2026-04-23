@@ -1,0 +1,167 @@
+# Beer Station Simulator
+
+Мини-игра в формате мобильной веб-страницы (статический HTML/JS, без сборщика). Запускается `python3 -m http.server 8080` из корня.
+
+## Архитектура
+
+```
+index.html              → шелл (app + глобальный HUD)
+styles.css              → все стили
+src/main.js             → bootstrap: монтирует HUD, открывает splash
+src/sceneManager.js     → роутер сцен (dynamic import), управляет видимостью HUD
+src/state.js            → единое игровое состояние + эмиттер + persistence (localStorage)
+src/hud.js              → HUD (3 стата), один инстанс на всю игру
+src/characters.js       → реестр персонажей (id, name, role, portrait, focus, action)
+src/endings.js          → матрица финалов
+src/jokes.js            → источник анекдотов (внешний API + локальный фолбэк)
+src/scenes/*.js         → сцены. Контракт: `export function mount(root, params?) { ... return cleanup? }`
+```
+
+### Контракт сцены
+
+```js
+export function mount(root, params) {
+  // отрисовать DOM внутри root
+  // повесить слушатели
+  return () => { /* снять слушатели, отменить запросы */ };
+}
+```
+
+`sceneManager.goTo(name, params)` вызывает cleanup предыдущей сцены, очищает `#app`, показывает/прячет HUD по списку `hudHiddenIn`, загружает модуль.
+
+Регистрация новой сцены — добавить запись в `scenes` объект в `sceneManager.js`.
+
+### HUD
+
+HUD живёт **вне** `#app` (в `<body>`), чтобы не стираться при смене сцен. Монтируется один раз в `main.js`. Подписан на `state.onChange` — автоматически перерисовывается при изменении статов.
+
+Прячется на сценах `splash` и `ending` (список в `sceneManager.js`).
+
+## Игровое состояние
+
+Хранится в `localStorage` под ключом `bs-simulator:save:v2`. При несовпадении `version` — игнорируется (save схема меняется = старые сохранки обнуляются).
+
+```js
+{
+  version: 2,
+  stats: { mood, money, health },
+  ending: null | "<id>",
+  progress: { currentScene, completedQuests: [] }
+}
+```
+
+### Статы
+
+| Стат     | Старт | Границы         | Описание                                  |
+|----------|------:|------------------|-------------------------------------------|
+| `health` |    5  | `>= 0` (clamp)   | Здоровье. `0` → финал.                    |
+| `money`  |   50  | любое (±)        | Деньги, злотые. Может уйти в минус.       |
+| `mood`   |    0  | любое (±)        | Настроение. Растёт от анекдотов и т. п.   |
+
+Хелперы в `state.js`:
+- `changeMood(n)`, `changeMoney(n)`, `changeHealth(n)` — инкремент (n может быть отрицательным).
+- `getStats()`, `getState()`.
+- `setEnding(id)` — фиксирует финал в сейве.
+- `onChange(fn)` — подписка (используется HUD).
+
+После любого изменения статов сцена **обязана** проверить финалы:
+
+```js
+import { matchEnding } from "../endings.js";
+import { getState, setEnding } from "../state.js";
+import { goTo } from "../sceneManager.js";
+
+changeMood(1);
+const e = matchEnding(getState());
+if (e) {
+  setEnding(e.id);
+  return goTo("ending", { id: e.id });
+}
+```
+
+## Матрица финалов
+
+Определена в `src/endings.js`. Каждое правило:
+
+```js
+{ id, priority, when: (state) => boolean, title, text }
+```
+
+`matchEnding(state)` возвращает финал с максимальным `priority` среди подошедших, либо `null`.
+
+| id          | приоритет | условие              | заголовок                  |
+|-------------|----------:|----------------------|----------------------------|
+| `kolskaya`  |      100  | `health <= 0`        | Увезли на кольскую         |
+| `durka`     |       90  | `mood > 50`          | Увезли в дурку             |
+
+### Как добавить финал
+
+1. В `endings.js` добавить объект в массив `endings`.
+2. Выбрать `priority`: выше = важнее (проверяется первым при конфликте условий). Смертельные/терминальные — 90–100, мягкие — 30–70.
+3. `when(state)` — чистая функция от `state`; никаких сторонних эффектов.
+4. `text` коротко описывает, что произошло. Пишется от третьего лица.
+
+Рекомендованные слоты под будущие финалы (свободны):
+
+- деньги ушли сильно в минус → «Занял не у тех».
+- депрессия (mood < -50) → «Ушёл в запой в одиночку».
+- идеальный баланс → победный финал.
+
+## Персонажи и действия
+
+Реестр: `src/characters.js`. Схема:
+
+```js
+{
+  id, name, language, role,
+  portrait: "references/charakters/<id>/<file>" | null,
+  focus: "50% 30%",      // background-position для портрета
+  game?: "<тег мини-игры>",
+  action?: "<scene-id>"  // если есть — клик в баре уходит в эту сцену
+}
+```
+
+Без картинки — `portrait: null`, в баре отрисуется плейсхолдер «?».
+
+### Действия (сцены) персонажей
+
+Одно действие = одна сцена. Именование: `src/scenes/<character-id>-<action>.js`, scene-id: `<character-id>-<action>`.
+
+Текущее:
+- `shkolnik-jokes` — Школьник рассказывает пошлый анекдот (источник: rzhunemogu.ru через CORS-прокси, fallback — локальный банк в `jokes.js`). `+1` к `mood` за каждый прочитанный.
+
+### Как добавить новое действие
+
+1. Создать `src/scenes/<id>-<action>.js` по контракту сцены.
+2. Зарегистрировать в `sceneManager.scenes`.
+3. В `characters.js` у персонажа прописать `action: "<scene-id>"`.
+4. Сцена сама вызывает `change*(n)` и `matchEnding` → `goTo("ending", ...)`.
+
+Для быстрого заведения персонажа — субагент `.claude/agents/new-character.md`.
+
+## Источник анекдотов
+
+`src/jokes.js`:
+- Основной: `https://rzhunemogu.ru/Rand.aspx?CType=11` (категория «Пошлые») через прокси `https://api.codetabs.com/v1/proxy?quest=…`. Ответ в windows-1251, декодируется через `TextDecoder`.
+- Фолбэк: локальный массив из ~10 шуток, чтобы игра оставалась играбельной без сети.
+- Уже показанные анекдоты из фолбэка запоминаются в пределах сессии и не повторяются, пока пул не исчерпан.
+
+## Стиль и UX
+
+- Макет «под мобильный»: `#app` шириной до 480px, центрирован, `min-height: 100dvh`.
+- HUD fixed, сверху-справа, учитывает `env(safe-area-inset-top)`.
+- Список гостей в баре — горизонтальный скролл с фиксированной шириной карточки (160px), scroll-snap.
+- Цветовая схема: `--bg #0a0608`, `--fg #f4ead5`, `--accent #e8312a`.
+- Без эмодзи в UI (только текстовые лейблы: `HP`, `zł`, `MOOD`).
+
+## Команды
+
+```
+python3 -m http.server 8080   # запустить
+open http://localhost:8080
+```
+
+Сбросить сохранение вручную:
+```js
+localStorage.removeItem("bs-simulator:save:v2");
+```

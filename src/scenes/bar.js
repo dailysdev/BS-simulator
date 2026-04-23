@@ -9,14 +9,13 @@ export function mount(root) {
 
     <div class="bar__stage">
       <div class="bar__counter">
+        <div class="bar__hint">Выбери, к кому подсесть</div>
         <div class="bar__guests" role="list">
           ${characters.map(renderGuest).join("")}
         </div>
         <div class="bar__counter-top"></div>
       </div>
     </div>
-
-    <div class="bar__hint">Выбери, к кому подсесть</div>
 
     <div class="dialog" hidden>
       <div class="dialog__card">
@@ -47,7 +46,9 @@ export function mount(root) {
     const guestEl = e.target.closest("[data-guest]");
     if (guestEl) {
       const c = getCharacter(guestEl.dataset.guest);
-      if (c) openDialog(c);
+      if (!c) return;
+      if (c.action) return goTo(c.action);
+      openDialog(c);
     }
   };
   el.addEventListener("click", onClick);

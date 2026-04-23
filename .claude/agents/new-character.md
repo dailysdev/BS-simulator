@@ -22,11 +22,15 @@ You add a new character to the BS-simulator game. The game is a static HTML/JS p
   id: "<folder name, kebab/snake>",     // must match references/charakters/<id>/
   name: "<display name>",                // from description.md
   language: "ru" | "be" | "en" | ...,   // normalize to ISO-ish short code
+  role: "<Гость | Владелец бара | Повар | ...>",
   game: "<optional mini-game tag>",      // only if description.md declares one
+  action: "<scene-id>",                  // only if a dedicated scene exists
   portrait: "references/charakters/<id>/<file>" | null,
   focus: "50% 30%",                      // background-position tuning; default "50% 30%"
 }
 ```
+
+See `CLAUDE.md` → "Персонажи и действия" for full rules. A plain character addition does NOT set `action` — that field appears only after someone ships a dedicated scene for them.
 
 If there is no image file in the folder, set `portrait: null`. The bar scene renders a "?" placeholder for empty portraits.
 
