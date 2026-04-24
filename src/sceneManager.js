@@ -2,14 +2,17 @@ import { show as showHud, hide as hideHud } from "./hud.js";
 
 const root = () => document.getElementById("app");
 
+const V = `?v=${Date.now()}`;
+
 const scenes = {
-  splash: () => import("./scenes/splash.js"),
-  bar: () => import("./scenes/bar.js"),
-  "shkolnik-jokes": () => import("./scenes/shkolnik-jokes.js"),
-  "otec-bar": () => import("./scenes/otec-bar.js"),
-  "vlados-drink": () => import("./scenes/vlados-drink.js"),
-  "malyshka-borrow": () => import("./scenes/malyshka-borrow.js"),
-  ending: () => import("./scenes/ending.js"),
+  splash: () => import(`./scenes/splash.js${V}`),
+  bar: () => import(`./scenes/bar.js${V}`),
+  "shkolnik-jokes": () => import(`./scenes/shkolnik-jokes.js${V}`),
+  "otec-bar": () => import(`./scenes/otec-bar.js${V}`),
+  "otec-beerpong": () => import(`./scenes/otec-beerpong.js${V}`),
+  "vlados-drink": () => import(`./scenes/vlados-drink.js${V}`),
+  "malyshka-borrow": () => import(`./scenes/malyshka-borrow.js${V}`),
+  ending: () => import(`./scenes/ending.js${V}`),
 };
 
 const hudHiddenIn = new Set(["splash", "ending"]);

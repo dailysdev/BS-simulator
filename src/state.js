@@ -1,6 +1,6 @@
 const KEY = "bs-simulator:save:v2";
 
-const defaultStats = () => ({ mood: 0, money: 50, health: 5 });
+const defaultStats = () => ({ mood: 0, money: 200, health: 5 });
 
 const defaultState = () => ({
   version: 2,
@@ -105,6 +105,18 @@ export function setFlag(key, value) {
   state.flags[key] = value;
   persist();
   emit();
+}
+
+export function visit(characterId) {
+  state.flags = state.flags || {};
+  const prev = state.flags.lastChar;
+  const isNewVisit = prev !== characterId;
+  state.flags.lastChar = characterId;
+  if (isNewVisit) {
+    persist();
+    emit();
+  }
+  return { isNewVisit, prev };
 }
 
 export function onChange(fn) {

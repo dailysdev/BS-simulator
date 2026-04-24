@@ -1,7 +1,7 @@
 import { goTo } from "../sceneManager.js";
 import { getCharacter } from "../characters.js";
 import { fetchJoke } from "../jokes.js";
-import { changeMood, getState, setEnding } from "../state.js";
+import { changeMood, getState, setEnding, visit } from "../state.js";
 import { matchEnding } from "../endings.js";
 
 const LAUGHS = [
@@ -26,6 +26,7 @@ function pickLaugh(prev) {
 }
 
 export function mount(root) {
+  visit("shkolnik");
   const c = getCharacter("shkolnik");
   const el = document.createElement("section");
   el.className = "scene joke-scene";

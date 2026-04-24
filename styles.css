@@ -11,6 +11,32 @@
 
 * { box-sizing: border-box; }
 
+/* Idle ambient motion — keep scenes feeling alive */
+@keyframes idle-breathe {
+  0%, 100% { transform: scale(1.05) translate(0, 0); }
+  50%      { transform: scale(1.09) translate(-10px, 12px); }
+}
+@keyframes idle-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-10px) rotate(-0.4deg); }
+}
+@keyframes idle-bg-drift {
+  0%   { background-position: 46% 20%; }
+  50%  { background-position: 54% 32%; }
+  100% { background-position: 46% 20%; }
+}
+@keyframes idle-bg-drift-splash {
+  0%   { background-position: 46% 26%; }
+  50%  { background-position: 54% 38%; }
+  100% { background-position: 46% 26%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .joke-scene__portrait,
+  .splash__title,
+  .splash,
+  .bar { animation: none !important; }
+}
+
 html, body {
   margin: 0;
   padding: 0;
@@ -61,6 +87,7 @@ body {
     url("references/interier/ea55a73b-b338-4bd3-be95-dee850bc5377.png");
   background-size: cover;
   background-position: center 30%;
+  animation: idle-bg-drift-splash 10s ease-in-out infinite;
 }
 
 .splash__title {
@@ -69,6 +96,8 @@ body {
   font-family: "Georgia", "Times New Roman", serif;
   letter-spacing: 0.02em;
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+  animation: idle-float 6s ease-in-out infinite;
+  will-change: transform;
 }
 
 .splash__title .kicker {
@@ -140,6 +169,7 @@ body {
   background-size: cover;
   background-position: center 25%;
   overflow: hidden;
+  animation: idle-bg-drift 9s ease-in-out infinite;
 }
 
 .bar__back {
@@ -313,13 +343,27 @@ body {
 
 .bar__hint {
   text-align: center;
-  font-size: 11px;
-  letter-spacing: 0.22em;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: rgba(244, 234, 213, 0.7);
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  color: var(--fg);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95), 0 0 14px rgba(232, 49, 42, 0.3);
   pointer-events: none;
-  padding: 0 20px 10px;
+  padding: 4px 20px 12px;
+}
+.bar__hint::before,
+.bar__hint::after {
+  content: "";
+  display: inline-block;
+  vertical-align: middle;
+  width: 28px;
+  height: 1px;
+  margin: 0 10px;
+  background: linear-gradient(90deg, transparent, var(--accent));
+}
+.bar__hint::after {
+  background: linear-gradient(90deg, var(--accent), transparent);
 }
 
 /* HUD */
@@ -380,9 +424,12 @@ body {
 
 .joke-scene__portrait {
   position: absolute;
-  inset: 0;
+  inset: -20px;
   background-size: cover;
   background-repeat: no-repeat;
+  animation: idle-breathe 8s ease-in-out infinite;
+  will-change: transform;
+  transform-origin: 50% 40%;
 }
 .joke-scene__portrait::after {
   content: "";
@@ -598,6 +645,127 @@ body {
   font-size: 16px;
   letter-spacing: 0.04em;
 }
+
+/* Beer pong (otec) — animated arena */
+.joke-scene__portrait--dim::after {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(10, 6, 8, 0.8) 0%,
+      rgba(10, 6, 8, 0.5) 40%,
+      rgba(10, 6, 8, 0.9) 100%
+    );
+}
+
+.pong {
+  position: absolute;
+  top: calc(60px + var(--safe-top));
+  left: 16px;
+  right: 16px;
+  height: 52vh;
+  min-height: 320px;
+  z-index: 4;
+  overflow: hidden;
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(10, 6, 8, 0.6) 0%, rgba(10, 6, 8, 0.35) 100%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(244, 234, 213, 0.05) 0 8%,
+      transparent 8% 16%
+    );
+  border: 1px solid rgba(244, 234, 213, 0.12);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6) inset;
+}
+
+.pong__row {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  padding: 0 14%;
+  pointer-events: none;
+}
+.pong__row--otec { top: 14%; }
+.pong__row--player { bottom: 10%; }
+
+.cup {
+  display: block;
+  width: 44px;
+  height: 54px;
+  border-radius: 8px 8px 22px 22px / 6px 6px 30px 30px;
+  border: 2px solid rgba(244, 234, 213, 0.55);
+  background:
+    linear-gradient(180deg, rgba(255, 210, 140, 0.0) 0 20%, rgba(160, 90, 40, 0.85) 25%, #3a1e0a 95%),
+    radial-gradient(ellipse at 50% 12%, rgba(255, 220, 150, 0.75) 0 45%, transparent 60%);
+  box-shadow:
+    inset 0 -6px 10px rgba(0, 0, 0, 0.55),
+    0 6px 10px rgba(0, 0, 0, 0.45);
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+.cup--empty {
+  background: transparent;
+  border-color: rgba(244, 234, 213, 0.22);
+  box-shadow: none;
+  opacity: 0.35;
+  transform: translateY(4px) scale(0.9);
+}
+
+.pong__aim {
+  position: absolute;
+  top: 5%;
+  left: 0;
+  width: 2px;
+  height: 18%;
+  background: linear-gradient(180deg, var(--accent), transparent);
+  box-shadow: 0 0 12px rgba(232, 49, 42, 0.8);
+  pointer-events: none;
+  will-change: transform;
+}
+.pong__aim[hidden] { display: none; }
+.pong__aim::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: -6px;
+  width: 14px;
+  height: 8px;
+  background: var(--accent);
+  clip-path: polygon(50% 100%, 0 0, 100% 0);
+  box-shadow: 0 0 10px rgba(232, 49, 42, 0.9);
+}
+
+.pong__ball {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 30% 30%, #fff 0 30%, #d9cfa9 60%, #8a7d55 100%);
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.55),
+    inset -2px -2px 4px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+  will-change: transform;
+}
+.pong__ball[hidden] { display: none; }
+
+.pong__panel {
+  background: linear-gradient(
+    180deg,
+    rgba(10, 6, 8, 0) 0%,
+    rgba(10, 6, 8, 0.95) 30%,
+    rgba(10, 6, 8, 1) 100%
+  );
+}
+
+.menu__item--pong {
+  margin-top: 6px;
+  border-color: rgba(232, 49, 42, 0.5);
+}
+.menu__item--pong .menu__price { font-size: 13px; }
 
 /* Menu (otec bar) */
 .menu {
