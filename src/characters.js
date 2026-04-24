@@ -45,6 +45,7 @@ export const characters = [
     name: "Віталь",
     language: "be",
     role: "Гость",
+    hidden: true,
     avatar: "references/charakters/vital/avatar.png",
     focus: "45% 30%",
   },

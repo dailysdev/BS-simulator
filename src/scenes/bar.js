@@ -11,7 +11,7 @@ export async function mount(root) {
       <div class="bar__counter">
         <div class="bar__hint">Выбери, к кому подсесть</div>
         <div class="bar__guests" role="list">
-          ${characters.map(renderGuest).join("")}
+          ${characters.filter((c) => !c.hidden).map(renderGuest).join("")}
         </div>
         <div class="bar__counter-top"></div>
       </div>
