@@ -1,18 +1,22 @@
-name: Владос
+name: Vlados
 language: Belarusian
-role: Гость
-game: Перепить Владоса (Камень-Нажніцы-Папера)
+role: Guest
+game: Out-drink Vlados (Rock-Paper-Scissors)
 
-## Игра: vlados-drink
+## Scene: vlados-drink
 
-Владос предлагает «парэчку» на беларускай. Механика — Камень-Нажніцы-Папера, матч до 3 побед в раундах.
+Vlados offers a “парэчка” (currant liqueur) round in Belarusian. Mechanic: Rock-Paper-Scissors, match to 3 round wins.
 
-- Сцена: `src/scenes/vlados-drink.js`
-- Раунд:
-  - Проигрыш игрока: `-0.5 health`, `-5 mood`.
-  - Ничья не считается — переигровка.
-  - Победа игрока в раунде — счёт растёт.
-- Матч (первый до 3 побед):
-  - Победа игрока → полноэкранно проигрывается `references/charakters/vlados/vlados.mp4` (есть кнопка «Далей» для скипа), затем `+20 money`, `+10 mood`. Ставится флаг `vladosBeaten` — повторный заход блокируется фразой «Хопіць, братка…».
-  - Поражение игрока (Владос 3) → кнопка «Выйсці» без дополнительных штрафов сверх набранных за раунды.
-- Если `health → 0` за раунд проигрыша — переход в финал `kolskaya`.
+- Scene file: `src/scenes/vlados-drink.js`
+- Round:
+  - Player loses: `-0.5 health`, `-5 mood`.
+  - Ties don't count — replay.
+  - Player wins the round: score increments.
+- Match (first to 3):
+  - Player wins → fullscreen playback of `references/charakters/vlados/vlados.mp4` (with a “Далей” skip button), then `+20 money`, `+10 mood`. Sets flag `vladosBeaten`; re-entries are blocked with “Хопіць, братка…”.
+  - Player loses (Vlados 3) → “Выйсці” button, no extra penalty beyond the per-round damage.
+- If `health → 0` on a losing round → routes to the appropriate death ending (`kolskaya` by default).
+
+## Visuals
+
+- Top-center score pill shows two sets of 3 dots with a `:` separator, no text labels.

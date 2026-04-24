@@ -89,12 +89,10 @@ export function mount(root) {
   const renderScore = () => {
     scoreEl.innerHTML = `
       <div class="vlados-score__side">
-        <div class="vlados-score__who">Ты</div>
         <div class="vlados-score__pips">${pipsHtml(playerWins)}</div>
       </div>
-      <div class="vlados-score__vs">да ${ROUNDS_TO_WIN}</div>
+      <div class="vlados-score__sep">:</div>
       <div class="vlados-score__side">
-        <div class="vlados-score__who">${c.name}</div>
         <div class="vlados-score__pips">${pipsHtml(vladosWins)}</div>
       </div>
     `;
@@ -132,15 +130,9 @@ export function mount(root) {
     revealEl.hidden = false;
     revealEl.innerHTML = `
       <div class="vlados-reveal__row">
-        <div class="vlados-reveal__side">
-          <div class="vlados-reveal__who">Ты</div>
-          <div class="vlados-reveal__pick">${p.label}</div>
-        </div>
+        <div class="vlados-reveal__pick">${p.label}</div>
         <div class="vlados-reveal__vs">vs</div>
-        <div class="vlados-reveal__side">
-          <div class="vlados-reveal__who">${c.name}</div>
-          <div class="vlados-reveal__pick">${v.label}</div>
-        </div>
+        <div class="vlados-reveal__pick">${v.label}</div>
       </div>
       <div class="vlados-reveal__outcome vlados-reveal__outcome--${outcome}">
         ${outcome === "win" ? "Раунд твой" : outcome === "loss" ? "Раунд Владоса" : "Нічыя"}

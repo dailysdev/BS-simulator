@@ -1,14 +1,14 @@
-name: Малышка
+name: Malyshka
 language: Belarusian
-role: Гость
-game: Одолжить денег
+role: Guest
+game: Borrow money
 
-## Игра: malyshka-borrow
+## Scene: malyshka-borrow
 
-У Малышки можно стрельнуть `50 zł`.
+Malyshka can spot the player `50 zł`.
 
-- Сцена: `src/scenes/malyshka-borrow.js`
-- Заём: `+50 money`, `-10 mood`, долг (флаг `malyshkaDebt`) увеличивается на 50.
-- Текущий размер долга всегда виден на экране.
-- **Один заём за заход** (флаг `malyshkaBorrowedThisVisit`). Вторая попытка в тот же визит — случайный язвительный отказ без изменения статов.
-- Флаг `malyshkaBorrowedThisVisit` сбрасывается после визита к другому персонажу (через `visit()` в `state.js`).
+- Scene file: `src/scenes/malyshka-borrow.js`
+- Loan: `+50 money`, `-10 mood`, debt (flag `malyshkaDebt`) increases by 50.
+- Current debt is always visible.
+- **One loan per visit** (flag `malyshkaBorrowedThisVisit`). A second attempt in the same visit triggers a random snarky refusal with no stat change.
+- `malyshkaBorrowedThisVisit` resets when the player visits another character (tracked via `visit()` in `state.js`).
