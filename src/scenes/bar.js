@@ -57,8 +57,8 @@ export async function mount(root) {
 }
 
 function renderGuest(c) {
-  const portrait = c.portrait
-    ? `<div class="guest__portrait" style="background-image:url('${c.portrait}'); background-position:${c.focus || "50% 30%"}"></div>`
+  const portrait = c.avatar
+    ? `<div class="guest__portrait" style="background-image:url('${c.avatar}'); background-position:${c.focus || "50% 30%"}"></div>`
     : `<div class="guest__portrait guest__portrait--empty" aria-hidden="true">?</div>`;
   return `
     <button class="guest" data-guest="${c.id}" role="listitem">
