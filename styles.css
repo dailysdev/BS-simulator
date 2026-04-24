@@ -11,6 +11,32 @@
 
 * { box-sizing: border-box; }
 
+/* Idle ambient motion — keep scenes feeling alive */
+@keyframes idle-breathe {
+  0%, 100% { transform: scale(1.05) translate(0, 0); }
+  50%      { transform: scale(1.09) translate(-10px, 12px); }
+}
+@keyframes idle-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-10px) rotate(-0.4deg); }
+}
+@keyframes idle-bg-drift {
+  0%   { background-position: 46% 20%; }
+  50%  { background-position: 54% 32%; }
+  100% { background-position: 46% 20%; }
+}
+@keyframes idle-bg-drift-splash {
+  0%   { background-position: 46% 26%; }
+  50%  { background-position: 54% 38%; }
+  100% { background-position: 46% 26%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .joke-scene__portrait,
+  .splash__title,
+  .splash,
+  .bar { animation: none !important; }
+}
+
 html, body {
   margin: 0;
   padding: 0;
@@ -61,6 +87,7 @@ body {
     url("references/interier/ea55a73b-b338-4bd3-be95-dee850bc5377.png");
   background-size: cover;
   background-position: center 30%;
+  animation: idle-bg-drift-splash 10s ease-in-out infinite;
 }
 
 .splash__title {
@@ -69,6 +96,8 @@ body {
   font-family: "Georgia", "Times New Roman", serif;
   letter-spacing: 0.02em;
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+  animation: idle-float 6s ease-in-out infinite;
+  will-change: transform;
 }
 
 .splash__title .kicker {
@@ -140,6 +169,7 @@ body {
   background-size: cover;
   background-position: center 25%;
   overflow: hidden;
+  animation: idle-bg-drift 9s ease-in-out infinite;
 }
 
 .bar__back {
@@ -394,9 +424,12 @@ body {
 
 .joke-scene__portrait {
   position: absolute;
-  inset: 0;
+  inset: -20px;
   background-size: cover;
   background-repeat: no-repeat;
+  animation: idle-breathe 8s ease-in-out infinite;
+  will-change: transform;
+  transform-origin: 50% 40%;
 }
 .joke-scene__portrait::after {
   content: "";
