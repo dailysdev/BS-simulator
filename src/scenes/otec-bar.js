@@ -8,6 +8,7 @@ import {
   getFlag,
   setFlag,
   setEnding,
+  visit,
 } from "../state.js";
 import { matchEnding } from "../endings.js";
 
@@ -19,6 +20,8 @@ const drinks = [
 
 export function mount(root) {
   const c = getCharacter("otec");
+  const { isNewVisit } = visit("otec");
+  if (isNewVisit) setFlag("kranuvkaUsed", false);
   const el = document.createElement("section");
   el.className = "scene joke-scene otec-bar";
   el.innerHTML = `
@@ -31,6 +34,10 @@ export function mount(root) {
       <div class="joke-scene__speaker">${c.name} · ${c.role}</div>
       <div class="joke-scene__text">Что наливать, дружище?</div>
       <div class="menu" data-role="menu"></div>
+      <button class="menu__item menu__item--pong" data-action="pong">
+        <span class="menu__name">Сыграть в бирпонг</span>
+        <span class="menu__price">ставка 50 zł</span>
+      </button>
     </div>
   `;
   root.appendChild(el);
@@ -71,6 +78,7 @@ export function mount(root) {
 
   const onClick = (ev) => {
     if (ev.target.closest('[data-action="back"]')) return goTo("bar");
+    if (ev.target.closest('[data-action="pong"]')) return goTo("otec-beerpong");
     const btn = ev.target.closest("[data-drink]");
     if (!btn || btn.disabled) return;
     const d = drinks.find((x) => x.id === btn.dataset.drink);

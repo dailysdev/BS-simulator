@@ -8,6 +8,7 @@ import {
   setEnding,
   getFlag,
   setFlag,
+  visit,
 } from "../state.js";
 import { matchEnding } from "../endings.js";
 
@@ -42,6 +43,7 @@ const WIN_MOOD = 10;
 const VIDEO_PATH = "references/charakters/vlados/vlados.mp4";
 
 export function mount(root) {
+  visit("vlados");
   const c = getCharacter("vlados");
 
   const el = document.createElement("section");

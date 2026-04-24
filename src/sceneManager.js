@@ -7,6 +7,7 @@ const scenes = {
   bar: () => import("./scenes/bar.js"),
   "shkolnik-jokes": () => import("./scenes/shkolnik-jokes.js"),
   "otec-bar": () => import("./scenes/otec-bar.js"),
+  "otec-beerpong": () => import("./scenes/otec-beerpong.js"),
   "vlados-drink": () => import("./scenes/vlados-drink.js"),
   "malyshka-borrow": () => import("./scenes/malyshka-borrow.js"),
   ending: () => import("./scenes/ending.js"),
