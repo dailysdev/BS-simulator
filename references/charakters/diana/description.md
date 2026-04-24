@@ -1,4 +1,8 @@
 name: Диана
-language: Russina
-game: Файтинг
+language: Russian
 role: Гость
+game: Файтинг (не реализовано)
+
+## Игра: diana-fight (TBD)
+
+Планируемая мини-игра — файтинг. Сцена и механика ещё не реализованы.

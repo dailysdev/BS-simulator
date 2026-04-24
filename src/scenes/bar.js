@@ -1,7 +1,7 @@
 import { goTo } from "../sceneManager.js";
-import { characters, getCharacter } from "../characters.js";
 
-export function mount(root) {
+export async function mount(root) {
+  const { characters, getCharacter } = await import(`../characters.js?v=${Date.now()}`);
   const el = document.createElement("section");
   el.className = "scene bar";
   el.innerHTML = `

@@ -12,6 +12,7 @@ const scenes = {
   "otec-beerpong": () => import(`./scenes/otec-beerpong.js${V}`),
   "vlados-drink": () => import(`./scenes/vlados-drink.js${V}`),
   "malyshka-borrow": () => import(`./scenes/malyshka-borrow.js${V}`),
+  "ben-cook": () => import(`./scenes/ben-cook.js${V}`),
   ending: () => import(`./scenes/ending.js${V}`),
 };
 
@@ -30,5 +31,5 @@ export async function goTo(name, params = {}) {
   else showHud();
 
   const mod = await loader();
-  currentCleanup = mod.mount(root(), params) || null;
+  currentCleanup = (await mod.mount(root(), params)) || null;
 }

@@ -1,3 +1,6 @@
 name: Віталь
-language: Belarussian
-Role: Гость
+language: Belarusian
+role: Гость
+game: —
+
+Мини-игра пока не задумана. Персонаж присутствует в ростере без `action`.
