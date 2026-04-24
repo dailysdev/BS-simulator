@@ -58,6 +58,8 @@ export const characters = [
     name: "Бен",
     language: "ru",
     role: "Повар",
+    game: "Закуска",
+    action: "ben-cook",
     portrait: "references/charakters/ben/ecad18a2-d9d3-41d3-922c-346ade0f7362.png",
     focus: "50% 20%",
   },

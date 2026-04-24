@@ -883,3 +883,77 @@ body {
   line-height: 1.45;
   color: rgba(244, 234, 213, 0.9);
 }
+
+/* Ben cooking QTE */
+.cook {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 84px;
+}
+.cook__track {
+  position: relative;
+  height: 26px;
+  background: rgba(244, 234, 213, 0.08);
+  border: 1px solid rgba(244, 234, 213, 0.2);
+  border-radius: 13px;
+  overflow: hidden;
+}
+.cook__zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+.cook__zone--green {
+  background: rgba(86, 180, 96, 0.35);
+}
+.cook__zone--perfect {
+  background: rgba(232, 49, 42, 0.45);
+}
+.cook__pointer {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 4px;
+  margin-left: -2px;
+  background: var(--fg);
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(244, 234, 213, 0.6);
+  transition: background 0.1s;
+}
+.cook__pointer--perfect { background: #ffdf5a; box-shadow: 0 0 10px #ffdf5a; }
+.cook__pointer--good { background: #56b460; box-shadow: 0 0 10px #56b460; }
+.cook__pointer--miss { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+.cook__hits {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+.cook__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(244, 234, 213, 0.2);
+}
+.cook__dot--hit { background: #56b460; }
+.cook__dot--miss { background: var(--accent); }
+.cook__result {
+  text-align: center;
+  padding: 6px 0;
+}
+.cook__result-title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.cook__result-stats {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(244, 234, 213, 0.85);
+}
