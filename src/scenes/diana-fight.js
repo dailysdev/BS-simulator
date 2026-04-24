@@ -266,6 +266,7 @@ export function mount(root) {
     } else {
       showBanner("K.O.", "mk__banner--loss");
       logEl.textContent = pick(LOSS_QUOTES);
+      setFlag("deathCause", "fight");
       changeHealth(LOSS_HEALTH);
     }
 
@@ -274,6 +275,7 @@ export function mount(root) {
       setEnding(end.id);
       return goTo("ending", { id: end.id });
     }
+    setFlag("deathCause", null);
     showEndButtons(win);
   }
 

@@ -1,24 +1,24 @@
-name: Отец
+name: Otec
 language: Russian
-role: Владелец бара
-game: Бар + Бирпонг
+role: Bar owner
+game: Bar + Beer pong
 
-## Игра 1: otec-bar
+## Scene 1: otec-bar
 
-Отец-бармен наливает напитки.
+Otec pours drinks at the bar.
 
-- Сцена: `src/scenes/otec-bar.js`
-- Каждый платный напиток: `+5 mood`, списывает цену с `money`, изменяет `health` (зависит от напитка).
-- «Кранувка плиз» — бесплатная, `+0.5 health`, **одна за заход**. Флаг: `kranuvkaUsed`. Сбрасывается после визита к другому персонажу (через `visit()` в `state.js`).
-- Отсюда же кнопка перехода в мини-игру `otec-beerpong`.
+- Scene file: `src/scenes/otec-bar.js`
+- Each paid drink: `+5 mood`, deducts its price from `money`, adjusts `health` (depends on the drink).
+- “Кранувка плиз” is free, `+0.5 health`, **one per visit**. Flag: `kranuvkaUsed`. Reset when the player visits another character (tracked via `visit()` in `state.js`).
+- From here the player can also enter the `otec-beerpong` mini-game.
 
-## Игра 2: otec-beerpong
+## Scene 2: otec-beerpong
 
-Бирпонг с физикой.
+Physics-based beer pong.
 
-- Сцена: `src/scenes/otec-beerpong.js`
-- Ставка: `50 zł`. У каждой стороны по 3 стакана.
-- Прицел-линия качается над верхним рядом (RAF-цикл). По клику «Бросок» линия замирает, мяч летит параболой. Попадание определяется по x-координате приземления относительно радиуса стакана.
-- Отец бросает автоматически: ~55% hit с разбросом.
-- Победа: `+50 money`, `+10 mood`.
-- Поражение: `-50 money`.
+- Scene file: `src/scenes/otec-beerpong.js`
+- Stake: `50 zł`. Three cups per side.
+- A targeting line oscillates above the top row via a RAF loop. On “Бросок” the line locks and the ball flies on a parabola. Hit is determined by the x-coordinate of the landing relative to the cup radius.
+- Otec throws automatically: ~55% hit rate with random offset.
+- Win: `+50 money`, `+10 mood`.
+- Loss: `-50 money`.

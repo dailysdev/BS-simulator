@@ -343,14 +343,17 @@ body {
 
 .bar__hint {
   text-align: center;
-  font-size: 15px;
+  font-size: clamp(11px, 3.2vw, 14px);
   font-weight: 800;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--fg);
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95), 0 0 14px rgba(232, 49, 42, 0.3);
   pointer-events: none;
-  padding: 4px 20px 12px;
+  padding: 4px 16px 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .bar__hint::before,
 .bar__hint::after {
@@ -546,39 +549,29 @@ body {
 /* Vlados drinking game */
 .vlados-score {
   position: absolute;
-  top: calc(12px + var(--safe-top));
-  left: 60px;
-  right: 200px;
+  top: calc(60px + var(--safe-top));
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 5;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 10px;
-  padding: 6px 10px;
+  padding: 6px 14px;
   background: rgba(10, 6, 8, 0.78);
   border: 1px solid rgba(244, 234, 213, 0.18);
   border-radius: 999px;
   backdrop-filter: blur(6px);
 }
 .vlados-score__side {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
 }
-.vlados-score__who {
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+.vlados-score__pips { display: inline-flex; gap: 4px; }
+.vlados-score__sep {
+  font-size: 13px;
   font-weight: 800;
-  color: rgba(244, 234, 213, 0.7);
-}
-.vlados-score__pips { display: inline-flex; gap: 3px; }
-.vlados-score__vs {
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(244, 234, 213, 0.4);
-  font-weight: 700;
+  color: rgba(244, 234, 213, 0.6);
+  line-height: 1;
 }
 .pip {
   width: 10px;

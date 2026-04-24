@@ -1,72 +1,75 @@
 # Beer Station Simulator
 
-Мини-игра в формате мобильной веб-страницы (статический HTML/JS, без сборщика). Запускается `python3 -m http.server 8080` из корня.
+A mobile-style web mini-game (static HTML/JS, no bundler). Launch with `python3 -m http.server 8080` from the repo root.
 
-## Архитектура
+## Architecture
 
 ```
-index.html              → шелл (app + глобальный HUD)
-styles.css              → все стили
-src/main.js             → bootstrap: монтирует HUD, открывает splash
-src/sceneManager.js     → роутер сцен (dynamic import), управляет видимостью HUD
-src/state.js            → единое игровое состояние + эмиттер + persistence (localStorage)
-src/hud.js              → HUD (3 стата), один инстанс на всю игру
-src/characters.js       → реестр персонажей (id, name, role, portrait, focus, action)
-src/endings.js          → матрица финалов
-src/jokes.js            → источник анекдотов (внешний API + локальный фолбэк)
-src/scenes/*.js         → сцены. Контракт: `export function mount(root, params?) { ... return cleanup? }`
+index.html              → shell (#app + global HUD)
+styles.css              → all styles
+src/main.js             → bootstrap: mounts HUD, opens splash
+src/sceneManager.js     → scene router (dynamic import by name), toggles HUD
+src/state.js            → game state + emitter + persistence (localStorage)
+src/hud.js              → HUD (3 stats), single instance for the whole app
+src/characters.js       → character registry (id, name, role, avatar, scene, focus, action)
+src/endings.js          → endings matrix
+src/jokes.js            → jokes source (external API + local fallback)
+src/scenes/*.js         → scenes. Contract: `export function mount(root, params?) { return cleanup? }`
 ```
 
-### Контракт сцены
+### Scene contract
 
 ```js
 export function mount(root, params) {
-  // отрисовать DOM внутри root
-  // повесить слушатели
-  return () => { /* снять слушатели, отменить запросы */ };
+  // render DOM into root
+  // wire listeners
+  return () => { /* remove listeners, cancel timers */ };
 }
 ```
 
-`sceneManager.goTo(name, params)` вызывает cleanup предыдущей сцены, очищает `#app`, показывает/прячет HUD по списку `hudHiddenIn`, загружает модуль.
+`mount` may be `async`; `sceneManager` awaits it.
 
-Регистрация новой сцены — добавить запись в `scenes` объект в `sceneManager.js`.
+`sceneManager.goTo(name, params)` calls the previous scene's cleanup, clears `#app`, shows/hides the HUD based on `hudHiddenIn`, and dynamically imports `./scenes/<name>.js?v=<cache-bust>`. **Adding a new scene = drop the file at `src/scenes/<scene-id>.js` and wire a character's `action` to that id — no edits to `sceneManager` required.**
+
+The scene loader uses a `Date.now()` cache-bust so scene edits appear on reload. `bar.js` likewise dynamically imports `characters.js` with cache-bust so character registry edits pick up without a hard reload.
 
 ### HUD
 
-HUD живёт **вне** `#app` (в `<body>`), чтобы не стираться при смене сцен. Монтируется один раз в `main.js`. Подписан на `state.onChange` — автоматически перерисовывается при изменении статов.
+The HUD lives **outside** `#app` (in `<body>`) so it survives scene swaps. Mounted once from `main.js`. Subscribes to `state.onChange` and re-renders on every stat change.
 
-Прячется на сценах `splash` и `ending` (список в `sceneManager.js`).
+Hidden on scenes in `hudHiddenIn` (`splash`, `ending`). Each stat change triggers a pulse/shake + a floating `+N` / `-N` delta (green up, red down).
 
-## Игровое состояние
+## Game state
 
-Хранится в `localStorage` под ключом `bs-simulator:save:v2`. При несовпадении `version` — игнорируется (save схема меняется = старые сохранки обнуляются).
+Stored in `localStorage` under `bs-simulator:save:v2`. Mismatched `version` → ignored (save schema bumps wipe old saves).
 
 ```js
 {
   version: 2,
   stats: { mood, money, health },
+  flags: { /* per-game flags */ },
   ending: null | "<id>",
   progress: { currentScene, completedQuests: [] }
 }
 ```
 
-### Статы
+### Stats
 
-| Стат     | Старт | Границы         | Описание                                  |
-|----------|------:|------------------|-------------------------------------------|
-| `health` |    5  | `>= 0` (clamp)   | Здоровье. `0` → финал.                    |
-| `money`  |  200  | любое (±)        | Деньги, злотые. Может уйти в минус.       |
-| `mood`   |    0  | любое (±)        | Настроение. Растёт от анекдотов и т. п.   |
+| Stat     | Start | Bounds           | Notes                                    |
+|----------|------:|------------------|------------------------------------------|
+| `health` |    5  | `>= 0` (clamp)   | Health. `0` → ending.                    |
+| `money`  |  200  | any (±)          | zł. Can go negative.                     |
+| `mood`   |    0  | any (±)          | Mood. Rises from jokes, wins, etc.       |
 
-Хелперы в `state.js`:
-- `changeMood(n)`, `changeMoney(n)`, `changeHealth(n)` — инкремент (n может быть отрицательным, допускаются дробные значения).
+Helpers in `state.js`:
+- `changeMood(n)`, `changeMoney(n)`, `changeHealth(n)` — increment (negative allowed, fractional values allowed).
 - `getStats()`, `getState()`.
-- `setEnding(id)` — фиксирует финал в сейве.
-- `getFlag(key)` / `setFlag(key, value)` — произвольные флаги прогресса (живут в `state.flags`).
-- `visit(characterId)` — вызывать в `mount` каждой сцены действия персонажа. Возвращает `{ isNewVisit, prev }`: `isNewVisit=true`, если предыдущий визит был к другому персонажу. Используется для per-visit cooldown'ов: сцена сама решает, какие флаги сбросить при новом визите.
-- `onChange(fn)` — подписка (используется HUD).
+- `setEnding(id)` — record the ending in the save.
+- `getFlag(key)` / `setFlag(key, value)` — arbitrary progression flags (live in `state.flags`).
+- `visit(characterId)` — call this in `mount` of every character-action scene. Returns `{ isNewVisit, prev }`: `isNewVisit=true` when the previous visit was to a different character. Scenes use this to reset per-visit cooldown flags.
+- `onChange(fn)` — subscribe (used by HUD).
 
-После любого изменения статов сцена **обязана** проверить финалы:
+After any stat change a scene **must** check endings:
 
 ```js
 import { matchEnding } from "../endings.js";
@@ -81,93 +84,101 @@ if (e) {
 }
 ```
 
-## Матрица финалов
+## Endings matrix
 
-Определена в `src/endings.js`. Каждое правило:
+Defined in `src/endings.js`. Each rule:
 
 ```js
 { id, priority, when: (state) => boolean, title, text }
 ```
 
-`matchEnding(state)` возвращает финал с максимальным `priority` среди подошедших, либо `null`.
+`matchEnding(state)` returns the ending with the highest `priority` among those whose `when` returns true, or `null`.
 
-| id          | приоритет | условие              | заголовок                  |
-|-------------|----------:|----------------------|----------------------------|
-| `kolskaya`  |      100  | `health <= 0`        | Увезли на кольскую         |
-| `durka`     |       90  | `mood > 50`          | Увезли в дурку             |
+| id             | priority | condition                                           | title                         |
+|----------------|---------:|-----------------------------------------------------|-------------------------------|
+| `pancreatitis` |      120 | `flags.dranikEaten >= 8`                            | Pancreatitis from draniks     |
+| `hospital`     |      110 | `stats.health <= 0 && flags.deathCause === "fight"` | Taken to hospital             |
+| `kolskaya`     |      100 | `stats.health <= 0`                                 | Taken to the Kolska drunk tank|
+| `durka`        |       90 | `stats.mood > 50`                                   | Taken to the psych ward       |
 
-### Как добавить финал
+### Death source tagging
 
-1. В `endings.js` добавить объект в массив `endings`.
-2. Выбрать `priority`: выше = важнее (проверяется первым при конфликте условий). Смертельные/терминальные — 90–100, мягкие — 30–70.
-3. `when(state)` — чистая функция от `state`; никаких сторонних эффектов.
-4. `text` коротко описывает, что произошло. Пишется от третьего лица.
+Some endings care about *how* the player died, not just that HP hit 0. The convention: before the stat change that might zero HP, set a transient flag describing the cause, then clear it after endings are matched.
 
-Рекомендованные слоты под будущие финалы (свободны):
+- Diana's fight sets `flags.deathCause = "fight"` just before applying `LOSS_HEALTH`; the `hospital` ending only matches with that flag. Clear (`deathCause = null`) after the check so future damage from other sources doesn't misroute.
 
-- деньги ушли сильно в минус → «Занял не у тех».
-- депрессия (mood < -50) → «Ушёл в запой в одиночку».
-- идеальный баланс → победный финал.
+### Adding an ending
 
-## Персонажи и действия
+1. Add an entry to the `endings` array in `endings.js`.
+2. Pick `priority`: higher = wins in ties. Terminal deaths 90–120; softer outcomes 30–70.
+3. `when(state)` — pure function of `state` (stats + flags).
+4. `text` is short, third-person, describes what happened.
 
-Реестр: `src/characters.js`. Схема:
+## Characters & actions
+
+Registry: `src/characters.js`. Schema:
 
 ```js
 {
   id, name, language, role,
-  portrait: "references/charakters/<id>/<file>" | null,
-  focus: "50% 30%",      // background-position для портрета
-  game?: "<тег мини-игры>",
-  action?: "<scene-id>"  // если есть — клик в баре уходит в эту сцену
+  avatar: "references/charakters/<id>/avatar.png",    // bar tile portrait
+  scene:  "references/charakters/<id>/scene.png",     // scene background (optional)
+  focus: "50% 30%",                                   // background-position for the scene image
+  game?: "<mini-game tag>",
+  action?: "<scene-id>",                              // if present, clicking the guest opens this scene
+  hidden?: true,                                      // omit from the bar list
 }
 ```
 
-Без картинки — `portrait: null`, в баре отрисуется плейсхолдер «?».
+`avatar` is the portrait shown in the bar tile; `scene` (optional) is the larger composed image used as the background inside the character's scene. Scenes fall back to `avatar` when `scene` is missing.
 
-### Действия (сцены) персонажей
+`hidden: true` removes the character from the bar list without deleting them (e.g. `vital` is currently hidden).
 
-Одно действие = одна сцена. Именование: `src/scenes/<character-id>-<action>.js`, scene-id: `<character-id>-<action>`.
+### Character actions (scenes)
 
-Детали механик каждой мини-игры (ставки, эффекты на статы, флаги) живут в `references/charakters/<id>/description.md`. Здесь — только список сцен:
+One action = one scene. Naming: `src/scenes/<character-id>-<action>.js`, scene id `<character-id>-<action>`.
 
-- `shkolnik-jokes` → см. `references/charakters/shkolnik/description.md`
-- `otec-bar`, `otec-beerpong` → см. `references/charakters/otec/description.md`
-- `vlados-drink` → см. `references/charakters/vlados/description.md`
-- `malyshka-borrow` → см. `references/charakters/malyshka/description.md`
+Mechanic details live next to each character in `references/charakters/<id>/description.md`. Quick index:
 
-### Как добавить новое действие
+- `shkolnik-jokes` → [shkolnik/description.md](references/charakters/shkolnik/description.md)
+- `otec-bar`, `otec-beerpong` → [otec/description.md](references/charakters/otec/description.md)
+- `vlados-drink` → [vlados/description.md](references/charakters/vlados/description.md)
+- `malyshka-borrow` → [malyshka/description.md](references/charakters/malyshka/description.md)
+- `ben-cook` → [ben/description.md](references/charakters/ben/description.md)
+- `diana-fight` → [diana/description.md](references/charakters/diana/description.md)
 
-1. Создать `src/scenes/<id>-<action>.js` по контракту сцены.
-2. Зарегистрировать в `sceneManager.scenes`.
-3. В `characters.js` у персонажа прописать `action: "<scene-id>"`.
-4. Сцена сама вызывает `change*(n)` и `matchEnding` → `goTo("ending", ...)`.
+### Adding a new action
 
-Для быстрого заведения персонажа — субагент `.claude/agents/new-character.md`.
+1. Create `src/scenes/<id>-<action>.js` following the scene contract.
+2. Add `action: "<id>-<action>"` on the character in `characters.js`.
+3. Inside the scene, call `visit("<id>")` and `change*(n)`, then check `matchEnding` → `goTo("ending", ...)`.
+4. Document the mechanic in `references/charakters/<id>/description.md`.
 
-## Источник анекдотов
+`sceneManager` requires no edit — scenes are resolved by filename.
+
+## Jokes source
 
 `src/jokes.js`:
-- Основной: `https://rzhunemogu.ru/Rand.aspx?CType=11` (категория «Пошлые») через прокси `https://api.codetabs.com/v1/proxy?quest=…`. Ответ в windows-1251, декодируется через `TextDecoder`.
-- Фолбэк: локальный массив из ~10 шуток, чтобы игра оставалась играбельной без сети.
-- Уже показанные анекдоты из фолбэка запоминаются в пределах сессии и не повторяются, пока пул не исчерпан.
+- Primary: `https://rzhunemogu.ru/Rand.aspx?CType=11` (“vulgar” category) via `https://api.codetabs.com/v1/proxy?quest=…`. Response is windows-1251, decoded via `TextDecoder`.
+- Fallback: ~10 local jokes so the game stays playable offline.
+- Already-seen fallback jokes are remembered per session and do not repeat until the pool is exhausted.
 
-## Стиль и UX
+## Style and UX
 
-- Макет «под мобильный»: `#app` шириной до 480px, центрирован, `min-height: 100dvh`.
-- HUD fixed, сверху-справа, учитывает `env(safe-area-inset-top)`.
-- Список гостей в баре — горизонтальный скролл с фиксированной шириной карточки (160px), scroll-snap.
-- Цветовая схема: `--bg #0a0608`, `--fg #f4ead5`, `--accent #e8312a`.
-- Без эмодзи в UI (только текстовые лейблы: `HP`, `zł`, `MOOD`).
+- Mobile layout: `#app` up to 480px wide, centered, `min-height: 100dvh`.
+- HUD fixed top-right, respects `env(safe-area-inset-top)`.
+- Bar guest list is a horizontal scroll (160px fixed-width cards, scroll-snap).
+- Colors: `--bg #0a0608`, `--fg #f4ead5`, `--accent #e8312a`.
+- No emoji in UI (plain text labels: `HP`, `zł`, `MOOD`).
 
-## Команды
+## Commands
 
 ```
-python3 -m http.server 8080   # запустить
+python3 -m http.server 8080   # serve
 open http://localhost:8080
 ```
 
-Сбросить сохранение вручную:
+Wipe save manually:
 ```js
 localStorage.removeItem("bs-simulator:save:v2");
 ```

@@ -6,6 +6,8 @@ import {
   changeHealth,
   getState,
   getStats,
+  getFlag,
+  setFlag,
   setEnding,
   visit,
 } from "../state.js";
@@ -94,6 +96,7 @@ export function mount(root) {
 
   function startGame() {
     changeMoney(-DISH_PRICE);
+    setFlag("dranikEaten", (getFlag("dranikEaten") || 0) + 1);
     round = 0;
     hits = 0;
     phase = "playing";

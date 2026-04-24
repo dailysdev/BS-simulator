@@ -1,33 +1,45 @@
-name: Диана
+name: Diana
 language: Russian
-role: Гость
-game: Файтинг (Mortal Kombat-стиль)
+role: Guest
+game: Fighting (Mortal Kombat style)
 
-## Игра: diana-fight
+## Scene: diana-fight
 
-Файтинг в стилистике Mortal Kombat: две полоски HP по 100, на фоне зациклен оригинальный MK-тема-трек.
+A Mortal Kombat-styled duel. Both fighters start at 100 HP; the original MK theme loops in the background.
 
-- Сцена: `src/scenes/diana-fight.js`
-- Музыка: `references/charakters/diana/theme.mp3` (`loop`, volume 0.45). Браузер может блокировать автоплей до первого тапа — скрипт дожидается первого `pointerdown` и доигрывает.
+- Scene file: `src/scenes/diana-fight.js`
+- Music: `references/charakters/diana/theme.mp3` (looped, volume 0.45). Browsers may block autoplay until the first tap — the scene retries on `pointerdown`.
+- Rematchable without limit. Each cleared run increments `flags.dianaWins` and scales Diana up.
 
-### Управление
+### Controls
 
-- **Удар** — 8–12 урона, КД 0.5 с.
-- **Пинок** — 14–22 урона, КД 1.0 с.
-- **Блок** — удерживай кнопку; входящий урон режется до 20%. Атаковать во время блока нельзя.
+- **Удар (Punch)** — 6–10 damage, 550 ms cooldown.
+- **Пинок (Kick)** — 12–18 damage, 1100 ms cooldown.
+- **Блок (Block)** — hold to reduce incoming damage to 20% of raw roll. Attacking while blocking is disabled.
 
-### ИИ Дианы
+### Diana AI (LVL 1 base)
 
-- Атакует каждые 1.1–1.8 с, урон 10–18.
-- Блок игрока срабатывает автоматически по удержанию.
+- Attacks every 950–1500 ms for 12–20 damage.
+- Blocks incoming hits with 20% chance (incoming damage reduced to 20%).
 
-### Исход
+### Difficulty scaling
 
-- **Победа** (`dianaHp ≤ 0`): `+30 zł`, `+15 mood`, баннер «FLAWLESS!», ставится флаг `dianaBeaten` — повторный заход блокируется фразой «Хопіць, чэмпіён…».
-- **Поражение** (`playerHp ≤ 0`): `-2 health`, баннер «K.O.». Если реальный `health → 0` — финал `kolskaya`.
+For every `dianaWins` cleared:
 
-### Эффекты
+- Attack interval: `-90 ms` min & max (floors: 450 / 900 ms).
+- Damage min: `+1`, damage max: `+2`.
+- Block chance: `+0.05`, capped at `0.55`.
 
-- На удар — шейк и красный всплеск `-N`.
-- Блок — голубое свечение по рамке бойца.
-- Баннеры «FIGHT!» / «K.O.» / «FLAWLESS!» анимируются 1.2 с.
+The bar and intro banner show the current level (`ДИАНА · LVL N`, `ROUND N`).
+
+### Outcome
+
+- **Win** (Diana HP ≤ 0): `+30 zł`, `+15 mood`, banner “FLAWLESS!” / “LVL N CLEAR!”, increments `dianaWins`. Buttons: “Ещё раз” (re-enters the fight) and “В бар”.
+- **Loss** (player HP ≤ 0): sets `flags.deathCause = "fight"` before `-2 health` so the `hospital` ending takes priority over `kolskaya` on death. Banner “K.O.”. Buttons: “Ещё раз” and “В бар”.
+
+### Effects
+
+- Hit: screen-shake on the struck card + red `-N` pop-up.
+- Player block: blue glow on the player card while held.
+- Diana block: brief blue pulse on Diana's card when she blocks a hit.
+- Banners “FIGHT!” / “ROUND N” / “K.O.” / “FLAWLESS!” animate over 1.2 s.

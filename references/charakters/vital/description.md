@@ -1,6 +1,6 @@
-name: Віталь
+name: Vital
 language: Belarusian
-role: Гость
+role: Guest
 game: —
 
-Мини-игра пока не задумана. Персонаж присутствует в ростере без `action`.
+Currently `hidden: true` in [characters.js](../../../src/characters.js) — omitted from the bar list. No mini-game yet.

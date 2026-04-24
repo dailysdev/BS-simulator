@@ -1,14 +1,14 @@
-name: Школьник
+name: Shkolnik
 language: Russian
-role: Гость
-game: Пошлые анекдоты
+role: Guest
+game: Vulgar jokes
 
-## Игра: shkolnik-jokes
+## Scene: shkolnik-jokes
 
-Школьник рассказывает пошлые анекдоты.
+Shkolnik tells vulgar jokes on demand.
 
-- Сцена: `src/scenes/shkolnik-jokes.js`
-- Источник: rzhunemogu.ru (категория «Пошлые») через CORS-прокси `api.codetabs.com`. Ответ в windows-1251, декодируется `TextDecoder`.
-- Фолбэк: локальный банк шуток в `src/jokes.js` (~10 штук). Показанные из фолбэка не повторяются в пределах сессии, пока пул не исчерпан.
-- Эффект: `+1 mood` за каждый прочитанный анекдот.
-- Кнопки: «Ещё» (новый анекдот) / «Выйти».
+- Scene file: `src/scenes/shkolnik-jokes.js`
+- Source: rzhunemogu.ru (“vulgar” category) via the CORS proxy `api.codetabs.com`. Response is windows-1251, decoded with `TextDecoder`.
+- Fallback: local jokes bank in `src/jokes.js` (~10 entries). Already-shown fallback jokes are remembered per session and don't repeat until the pool is drained.
+- Effect: `+1 mood` per joke read.
+- Buttons: “Ещё” (next joke) / “Выйти”.
