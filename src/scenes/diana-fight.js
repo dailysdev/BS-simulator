@@ -117,8 +117,13 @@ export function mount(root) {
   if (getFlag("dianaBeaten")) {
     logEl.textContent = BLOCKED_QUOTE;
     controlsEl.hidden = true;
-    showEndButtons(false);
-    return () => cleanupFns.forEach((f) => f());
+    endEl.hidden = false;
+    endEl.innerHTML = `<button class="btn btn--primary" data-action="back">В бар</button>`;
+    const backHandler = (ev) => {
+      if (ev.target.closest('[data-action="back"]')) goTo("bar");
+    };
+    el.addEventListener("click", backHandler);
+    return () => el.removeEventListener("click", backHandler);
   }
 
   // Music
