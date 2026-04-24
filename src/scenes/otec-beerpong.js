@@ -2,6 +2,7 @@ import { goTo } from "../sceneManager.js";
 import { getCharacter } from "../characters.js";
 import {
   changeMoney,
+  changeMood,
   getState,
   setEnding,
   visit,
@@ -9,6 +10,7 @@ import {
 import { matchEnding } from "../endings.js";
 
 const BET = 50;
+const WIN_MOOD = 10;
 const CUPS = 3;
 const AIM_SPEED = 0.85; // traversals per second (full arena width one way)
 const BALL_DURATION = 780; // ms
@@ -249,6 +251,7 @@ export function mount(root) {
   const resolveMatch = (won) => {
     stopAim();
     changeMoney(won ? BET : -BET);
+    if (won) changeMood(WIN_MOOD);
     const e = matchEnding(getState());
     if (e) {
       setEnding(e.id);
