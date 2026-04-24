@@ -1,3 +1,6 @@
 name: Бен
-language: Russina
+language: Russian
 role: Повар
+game: —
+
+Мини-игра пока не задумана. Персонаж-повар, присутствует в ростере без `action`.
