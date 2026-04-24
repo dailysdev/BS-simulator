@@ -37,7 +37,7 @@ export function mount(root) {
     <button class="bar__back" data-action="back" aria-label="Назад">←</button>
 
     <div class="joke-scene__portrait joke-scene__portrait--dim"
-         style="background-image:url('${c.portrait}'); background-position:${c.focus}"></div>
+         style="background-image:url('${c.scene || c.avatar}'); background-position:${c.focus}"></div>
 
     <div class="pong" data-role="arena">
       <div class="pong__row pong__row--otec">

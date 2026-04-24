@@ -5,7 +5,8 @@ export const characters = [
     language: "ru",
     role: "Владелец бара",
     action: "otec-bar",
-    portrait: "references/charakters/otec/image.png",
+    avatar: "references/charakters/otec/avatar.png",
+    scene: "references/charakters/otec/scene.png",
     focus: "50% 30%",
   },
   {
@@ -15,7 +16,8 @@ export const characters = [
     role: "Гость",
     game: "анекдоты",
     action: "shkolnik-jokes",
-    portrait: "references/charakters/shkolnik/scene.png",
+    avatar: "references/charakters/shkolnik/avatar.png",
+    scene: "references/charakters/shkolnik/scene.png",
     focus: "50% 26%",
   },
   {
@@ -24,7 +26,8 @@ export const characters = [
     language: "be",
     role: "Гость",
     action: "vlados-drink",
-    portrait: "references/charakters/vlados/scene2.png",
+    avatar: "references/charakters/vlados/avatar.png",
+    scene: "references/charakters/vlados/scene.png",
     focus: "50% 28%",
   },
   {
@@ -33,7 +36,8 @@ export const characters = [
     language: "be",
     role: "Гость",
     action: "malyshka-borrow",
-    portrait: "references/charakters/malyshka/577c619e-2e92-4477-b6bc-aad384c1c94c.png",
+    avatar: "references/charakters/malyshka/avatar.png",
+    scene: "references/charakters/malyshka/scene.png",
     focus: "62% 35%",
   },
   {
@@ -41,7 +45,7 @@ export const characters = [
     name: "Віталь",
     language: "be",
     role: "Гость",
-    portrait: "references/charakters/vital/28ea3a6c-3185-46f1-9f4b-1daafe16f0b3.png",
+    avatar: "references/charakters/vital/avatar.png",
     focus: "45% 30%",
   },
   {
@@ -50,7 +54,7 @@ export const characters = [
     language: "ru",
     role: "Гость",
     game: "Файтинг",
-    portrait: "references/charakters/diana/fb0f12d2-d23d-456c-b87b-7864ba46461d.png",
+    avatar: "references/charakters/diana/avatar.png",
     focus: "45% 25%",
   },
   {
@@ -60,7 +64,8 @@ export const characters = [
     role: "Повар",
     game: "Закуска",
     action: "ben-cook",
-    portrait: "references/charakters/ben/ecad18a2-d9d3-41d3-922c-346ade0f7362.png",
+    avatar: "references/charakters/ben/avatar.png",
+    scene: "references/charakters/ben/scene.png",
     focus: "50% 20%",
   },
 ];

@@ -28,7 +28,7 @@ export function mount(root) {
     <button class="bar__back" data-action="back" aria-label="Назад">←</button>
 
     <div class="joke-scene__portrait"
-         style="background-image:url('${c.portrait}'); background-position:${c.focus}"></div>
+         style="background-image:url('${c.scene || c.avatar}'); background-position:${c.focus}"></div>
 
     <div class="joke-scene__panel">
       <div class="joke-scene__speaker">${c.name} · ${c.role}</div>
