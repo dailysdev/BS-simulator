@@ -13,23 +13,46 @@ import {
 import { matchEnding } from "../endings.js";
 
 const MAX_HP = 100;
-const PLAYER_PUNCH = { min: 8, max: 12, cooldown: 500, label: "Удар" };
-const PLAYER_KICK = { min: 14, max: 22, cooldown: 1000, label: "Пинок" };
-const DIANA_ATTACK_MIN_MS = 1100;
-const DIANA_ATTACK_MAX_MS = 1800;
-const DIANA_DMG_MIN = 10;
-const DIANA_DMG_MAX = 18;
-const DIANA_BLOCK_CHANCE = 0.18;
+
+// Player — slightly nerfed compared to v1
+const PLAYER_PUNCH = { min: 6, max: 10, cooldown: 550, label: "Удар" };
+const PLAYER_KICK = { min: 12, max: 18, cooldown: 1100, label: "Пинок" };
+
+// Diana base stats; each previous win (dianaWins) makes her harder
+const DIANA_BASE = {
+  attackMinMs: 950,
+  attackMaxMs: 1500,
+  dmgMin: 12,
+  dmgMax: 20,
+  blockChance: 0.2,
+};
+const DIANA_PER_WIN = {
+  attackMs: -90,    // faster
+  dmgMin: 1,
+  dmgMax: 2,
+  blockChance: 0.05,
+};
+const DIANA_FLOOR = {
+  attackMinMs: 450,
+  attackMaxMs: 900,
+  blockChanceMax: 0.55,
+};
+
 const BLOCK_MITIGATION = 0.2; // incoming dmg multiplier while blocking
 
-const WIN_MOOD = 15;
 const WIN_MONEY = 30;
+const WIN_MOOD = 15;
 const LOSS_HEALTH = -2;
 
-const INTRO_QUOTES = [
+const INTRO_QUOTES_FIRST = [
   "Диана: «Ну что, боец, попробуешь?»",
   "Диана: «Я в клубной лиге третье место. Удачи».",
   "Диана: «Fight! По-честному, без скидок».",
+];
+const INTRO_QUOTES_REMATCH = [
+  "Диана: «Опять пришёл? На этот раз без поблажек».",
+  "Диана: «Помнишь, как было? Теперь будет хуже».",
+  "Диана: «Снова ты. Ну, получай по новой».",
 ];
 
 const WIN_QUOTES = [
@@ -37,22 +60,43 @@ const WIN_QUOTES = [
   "Flawless-ish. Она ещё шевелится, но встать не может.",
   "Чемпион, забирай банк.",
 ];
-
 const LOSS_QUOTES = [
   "Диана: «Слабовато. Иди тренируйся».",
   "K.O. Лежишь в отключке, Отец отливает воду.",
   "Finish him? Она уже закончила.",
 ];
 
-const BLOCKED_QUOTE = "Хопіць, чэмпіён. Ты ж мяне ўжо ўклаў.";
-
 const rand = (a, b) => a + Math.random() * (b - a);
 const randi = (a, b) => Math.floor(rand(a, b + 1));
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
+function dianaConfig(wins) {
+  const scaledAttackMin = Math.max(
+    DIANA_FLOOR.attackMinMs,
+    DIANA_BASE.attackMinMs + wins * DIANA_PER_WIN.attackMs,
+  );
+  const scaledAttackMax = Math.max(
+    DIANA_FLOOR.attackMaxMs,
+    DIANA_BASE.attackMaxMs + wins * DIANA_PER_WIN.attackMs,
+  );
+  return {
+    attackMinMs: scaledAttackMin,
+    attackMaxMs: Math.max(scaledAttackMax, scaledAttackMin + 200),
+    dmgMin: DIANA_BASE.dmgMin + wins * DIANA_PER_WIN.dmgMin,
+    dmgMax: DIANA_BASE.dmgMax + wins * DIANA_PER_WIN.dmgMax,
+    blockChance: Math.min(
+      DIANA_FLOOR.blockChanceMax,
+      DIANA_BASE.blockChance + wins * DIANA_PER_WIN.blockChance,
+    ),
+  };
+}
+
 export function mount(root) {
   const c = getCharacter("diana");
   visit("diana");
+
+  const wins = getFlag("dianaWins") || 0;
+  const diana = dianaConfig(wins);
 
   const el = document.createElement("section");
   el.className = "scene diana-fight";
@@ -67,7 +111,7 @@ export function mount(root) {
         </div>
         <div class="mk__vs">VS</div>
         <div class="mk__bar mk__bar--enemy">
-          <div class="mk__bar-name">ДИАНА</div>
+          <div class="mk__bar-name">ДИАНА · LVL ${wins + 1}</div>
           <div class="mk__bar-track mk__bar-track--rev"><div class="mk__bar-fill" data-role="dianaHp"></div></div>
         </div>
       </div>
@@ -82,7 +126,7 @@ export function mount(root) {
         <div class="mk__banner" data-role="banner" hidden></div>
       </div>
 
-      <div class="mk__log" data-role="log">${pick(INTRO_QUOTES)}</div>
+      <div class="mk__log" data-role="log">${pick(wins === 0 ? INTRO_QUOTES_FIRST : INTRO_QUOTES_REMATCH)}</div>
 
       <div class="mk__controls" data-role="controls">
         <button class="btn mk__btn" data-action="punch">${PLAYER_PUNCH.label}</button>
@@ -114,23 +158,10 @@ export function mount(root) {
   let finished = false;
   const cleanupFns = [];
 
-  if (getFlag("dianaBeaten")) {
-    logEl.textContent = BLOCKED_QUOTE;
-    controlsEl.hidden = true;
-    endEl.hidden = false;
-    endEl.innerHTML = `<button class="btn btn--primary" data-action="back">В бар</button>`;
-    const backHandler = (ev) => {
-      if (ev.target.closest('[data-action="back"]')) goTo("bar");
-    };
-    el.addEventListener("click", backHandler);
-    return () => el.removeEventListener("click", backHandler);
-  }
-
   // Music
   audioEl.volume = 0.45;
   const tryPlay = () => audioEl.play().catch(() => {});
   tryPlay();
-  // Autoplay may be blocked — resume on first user interaction
   const resume = () => { tryPlay(); };
   el.addEventListener("pointerdown", resume, { once: true });
 
@@ -160,6 +191,13 @@ export function mount(root) {
     setTimeout(() => pop.remove(), 700);
   }
 
+  function flashBlock(cardEl) {
+    cardEl.classList.remove("mk__fighter--blocked");
+    void cardEl.offsetWidth;
+    cardEl.classList.add("mk__fighter--blocked");
+    setTimeout(() => cardEl.classList.remove("mk__fighter--blocked"), 320);
+  }
+
   function playerAttack(kind) {
     if (finished) return;
     const now = performance.now();
@@ -172,18 +210,25 @@ export function mount(root) {
     if (now - last < spec.cooldown) return;
     if (kind === "kick") lastKick = now; else lastPunch = now;
 
-    const dmg = randi(spec.min, spec.max);
+    const rawDmg = randi(spec.min, spec.max);
+    const blocked = Math.random() < diana.blockChance;
+    const dmg = blocked ? Math.max(1, Math.round(rawDmg * BLOCK_MITIGATION)) : rawDmg;
     dianaHp -= dmg;
-    hit(dianaCard, dmg);
-    logEl.textContent = `${spec.label}: -${dmg}`;
+    if (blocked) {
+      flashBlock(dianaCard);
+      logEl.textContent = `Диана блокирует. ${spec.label}: -${dmg}`;
+    } else {
+      hit(dianaCard, dmg);
+      logEl.textContent = `${spec.label}: -${dmg}`;
+    }
     renderBars();
     if (dianaHp <= 0) return endMatch(true);
   }
 
   function dianaAttack() {
     if (finished) return;
-    const dmgRaw = randi(DIANA_DMG_MIN, DIANA_DMG_MAX);
-    const dmg = playerBlocking ? Math.round(dmgRaw * BLOCK_MITIGATION) : dmgRaw;
+    const dmgRaw = randi(diana.dmgMin, diana.dmgMax);
+    const dmg = playerBlocking ? Math.max(1, Math.round(dmgRaw * BLOCK_MITIGATION)) : dmgRaw;
     playerHp -= dmg;
     hit(playerCard, dmg);
     logEl.textContent = playerBlocking
@@ -196,7 +241,7 @@ export function mount(root) {
 
   function scheduleDiana() {
     clearTimeout(dianaTimer);
-    const delay = rand(DIANA_ATTACK_MIN_MS, DIANA_ATTACK_MAX_MS);
+    const delay = rand(diana.attackMinMs, diana.attackMaxMs);
     dianaTimer = setTimeout(dianaAttack, delay);
   }
   scheduleDiana();
@@ -213,11 +258,11 @@ export function mount(root) {
     clearTimeout(dianaTimer);
     controlsEl.hidden = true;
     if (win) {
-      showBanner("FLAWLESS!", "mk__banner--win");
+      showBanner(wins === 0 ? "FLAWLESS!" : `LVL ${wins + 1} CLEAR!`, "mk__banner--win");
       logEl.textContent = pick(WIN_QUOTES);
       changeMoney(WIN_MONEY);
       changeMood(WIN_MOOD);
-      setFlag("dianaBeaten", true);
+      setFlag("dianaWins", wins + 1);
     } else {
       showBanner("K.O.", "mk__banner--loss");
       logEl.textContent = pick(LOSS_QUOTES);
@@ -238,7 +283,10 @@ export function mount(root) {
       <div class="mk__result">
         ${isWin ? `+${WIN_MONEY} zł · +${WIN_MOOD} MOOD` : `${LOSS_HEALTH} HP`}
       </div>
-      <button class="btn btn--primary" data-action="back">В бар</button>
+      <div class="mk__end-actions">
+        <button class="btn btn--primary" data-action="rematch">Ещё раз</button>
+        <button class="btn" data-action="back">В бар</button>
+      </div>
     `;
   }
 
@@ -246,13 +294,13 @@ export function mount(root) {
     const act = ev.target.closest("[data-action]")?.dataset.action;
     if (!act) return;
     if (act === "back") return goTo("bar");
+    if (act === "rematch") return goTo("diana-fight");
     if (act === "punch") return playerAttack("punch");
     if (act === "kick") return playerAttack("kick");
   };
   el.addEventListener("click", onClick);
   cleanupFns.push(() => el.removeEventListener("click", onClick));
 
-  // Block: hold gesture
   const blockBtn = el.querySelector('[data-action="block"]');
   const blockOn = (ev) => { ev.preventDefault(); setBlock(true); };
   const blockOff = () => setBlock(false);
@@ -267,7 +315,7 @@ export function mount(root) {
     blockBtn.removeEventListener("pointercancel", blockOff);
   });
 
-  showBanner("FIGHT!", "mk__banner--fight");
+  showBanner(wins === 0 ? "FIGHT!" : `ROUND ${wins + 1}`, "mk__banner--fight");
 
   return () => {
     finished = true;
