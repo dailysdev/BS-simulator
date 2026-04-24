@@ -21,26 +21,26 @@ const STEP_LABELS = ["Нашинкуй", "Обжарь", "Подай"];
 
 const RESULTS = {
   3: {
-    title: "Шедэўр!",
-    text: "Бен: «Вось гэта я разумею, хлопец. З'еш, пакуль гарачае».",
+    title: "Шедевр!",
+    text: "Бен: «Вот это я понимаю, дружище. Ешь, пока горячее».",
     health: 2,
     mood: 5,
   },
   2: {
-    title: "Нармальна",
-    text: "Бен: «Жраць можна. Не фестываль, але сытна».",
+    title: "Нормально",
+    text: "Бен: «Жрать можно. Не фестиваль, но сытно».",
     health: 1,
     mood: 3,
   },
   1: {
-    title: "Прыгарэла",
-    text: "Бен: «Ну ты і кухар… Еш сваё падгарэлае».",
+    title: "Пригорело",
+    text: "Бен: «Ну ты и повар… Ешь своё подгоревшее».",
     health: 0,
     mood: -2,
   },
   0: {
-    title: "Згарэла ўшчэнт",
-    text: "Бен: «Гэта нават сабака не возьме. Плаці за прадукты».",
+    title: "Сгорело дотла",
+    text: "Бен: «Это даже собака не возьмёт. Плати за продукты».",
     health: 0,
     mood: -5,
   },
@@ -60,7 +60,7 @@ export function mount(root) {
 
     <div class="joke-scene__panel">
       <div class="joke-scene__speaker">${c.name} · ${c.role}</div>
-      <div class="joke-scene__text" data-role="text">Бен: «Закажаш закусь? Дранікі, 20 zł. Але гатаваць будзеш сам — я толькі падказваю».</div>
+      <div class="joke-scene__text" data-role="text">Бен: «Закажешь закуску? Драники, 20 zł. Только готовить будешь сам — я лишь подсказываю».</div>
       <div class="cook" data-role="stage"></div>
       <div class="joke-scene__actions" data-role="actions"></div>
     </div>
@@ -88,7 +88,7 @@ export function mount(root) {
       <button class="btn" data-action="back">Выйти</button>
     `;
     if (!canAfford) {
-      textEl.textContent = "Бен: «Без грошай не кармлю, брат. Ідзі зарабі».";
+      textEl.textContent = "Бен: «Без денег не кормлю, брат. Иди заработай».";
     }
   }
 
@@ -101,7 +101,7 @@ export function mount(root) {
   }
 
   function renderRound() {
-    textEl.textContent = `Крок ${round + 1}/${ROUNDS}: ${STEP_LABELS[round]}. Жми, калі стрэлка ў зялёнай зоне.`;
+    textEl.textContent = `Шаг ${round + 1}/${ROUNDS}: ${STEP_LABELS[round]}. Жми, когда стрелка в зелёной зоне.`;
     stageEl.innerHTML = `
       <div class="cook__track">
         <div class="cook__zone cook__zone--green" style="left:${(50 - GREEN_ZONE * 50).toFixed(2)}%; width:${(GREEN_ZONE * 100).toFixed(2)}%"></div>
@@ -111,7 +111,7 @@ export function mount(root) {
       <div class="cook__hits" data-role="hits">${renderHitsDots()}</div>
     `;
     actionsEl.innerHTML = `
-      <button class="btn btn--primary" data-action="strike">Гатова!</button>
+      <button class="btn btn--primary" data-action="strike">Готово!</button>
     `;
     startPointer();
   }
@@ -195,7 +195,7 @@ export function mount(root) {
     `;
     const canAfford = getStats().money >= DISH_PRICE;
     actionsEl.innerHTML = `
-      <button class="btn btn--primary" data-action="order" ${canAfford ? "" : "disabled"}>Яшчэ (${DISH_PRICE} zł)</button>
+      <button class="btn btn--primary" data-action="order" ${canAfford ? "" : "disabled"}>Ещё (${DISH_PRICE} zł)</button>
       <button class="btn" data-action="back">Выйти</button>
     `;
   }

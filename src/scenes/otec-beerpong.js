@@ -261,7 +261,7 @@ export function mount(root) {
   };
 
   const startMatch = () => {
-    textEl.textContent = "Прыцэльвайся і кідай!";
+    textEl.textContent = "Прицеливайся и бросай!";
     refreshRect();
     startAim();
     showShoot();
