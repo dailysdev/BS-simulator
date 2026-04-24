@@ -13,6 +13,7 @@ const scenes = {
   "vlados-drink": () => import(`./scenes/vlados-drink.js${V}`),
   "malyshka-borrow": () => import(`./scenes/malyshka-borrow.js${V}`),
   "ben-cook": () => import(`./scenes/ben-cook.js${V}`),
+  "diana-fight": () => import(`./scenes/diana-fight.js${V}`),
   ending: () => import(`./scenes/ending.js${V}`),
 };
 

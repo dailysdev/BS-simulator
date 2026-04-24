@@ -54,7 +54,9 @@ export const characters = [
     language: "ru",
     role: "Гость",
     game: "Файтинг",
+    action: "diana-fight",
     avatar: "references/charakters/diana/avatar.png",
+    scene: "references/charakters/diana/scene.png",
     focus: "45% 25%",
   },
   {
