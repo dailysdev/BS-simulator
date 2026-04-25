@@ -1,8 +1,10 @@
+import { DRANIK_LIMIT, MOOD_HAPPY_LIMIT } from "./config.js";
+
 export const endings = [
   {
     id: "pancreatitis",
     priority: 120,
-    when: ({ flags }) => (flags?.dranikEaten || 0) >= 8,
+    when: ({ flags }) => (flags?.dranikEaten || 0) >= DRANIK_LIMIT,
     title: "Панкреатит от драников",
     text:
       "Девятый драник стал последним. Доктор в приёмном сказал: «Ну сколько можно жареного, мужик». Капельница, диета и долгая лекция — вечер определённо закончился.",
@@ -26,7 +28,7 @@ export const endings = [
   {
     id: "durka",
     priority: 90,
-    when: ({ stats }) => stats.mood > 50,
+    when: ({ stats }) => stats.mood > MOOD_HAPPY_LIMIT,
     title: "Увезли в дурку",
     text:
       "Стало так хорошо, что окружающие забеспокоились. Белый халат, тихий голос, и всё по расписанию.",

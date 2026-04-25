@@ -1,4 +1,5 @@
 import { goTo } from "../sceneManager.js";
+import { DEFAULT_PORTRAIT_FOCUS } from "../config.js";
 
 export async function mount(root) {
   const { characters, getCharacter } = await import(`../characters.js?v=${Date.now()}`);
@@ -58,7 +59,7 @@ export async function mount(root) {
 
 function renderGuest(c) {
   const portrait = c.avatar
-    ? `<div class="guest__portrait" style="background-image:url('${c.avatar}'); background-position:${c.focus || "50% 30%"}"></div>`
+    ? `<div class="guest__portrait" style="background-image:url('${c.avatar}'); background-position:${c.focus || DEFAULT_PORTRAIT_FOCUS}"></div>`
     : `<div class="guest__portrait guest__portrait--empty" aria-hidden="true">?</div>`;
   return `
     <button class="guest" data-guest="${c.id}" role="listitem">

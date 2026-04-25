@@ -3,13 +3,11 @@ import { getCharacter } from "../characters.js";
 import {
   changeMood,
   changeMoney,
-  getState,
   getFlag,
   setFlag,
-  setEnding,
   visit,
 } from "../state.js";
-import { matchEnding } from "../endings.js";
+import { checkAndRouteEnding } from "../scene-helpers.js";
 
 const BORROW = 50;
 const MOOD_COST = -10;
@@ -76,13 +74,7 @@ export function mount(root) {
     const cur = getFlag("malyshkaDebt") || 0;
     setFlag("malyshkaDebt", cur + BORROW);
     setFlag("malyshkaBorrowedThisVisit", true);
-
-    const e = matchEnding(getState());
-    if (e) {
-      setEnding(e.id);
-      return goTo("ending", { id: e.id });
-    }
-
+    if (checkAndRouteEnding()) return;
     textEl.textContent = pick(WELCOME);
     renderDebt();
   };

@@ -4,13 +4,11 @@ import {
   changeMood,
   changeMoney,
   changeHealth,
-  getState,
   getFlag,
   setFlag,
-  setEnding,
   visit,
 } from "../state.js";
-import { matchEnding } from "../endings.js";
+import { checkAndRouteEnding } from "../scene-helpers.js";
 
 const drinks = [
   { id: "piwo", name: "Пиво", price: 15, mood: 5, health: -0.5 },
@@ -67,12 +65,7 @@ export function mount(root) {
     changeHealth(d.health);
     changeMood(d.mood);
     if (d.once) setFlag("kranuvkaUsed", true);
-
-    const e = matchEnding(getState());
-    if (e) {
-      setEnding(e.id);
-      return goTo("ending", { id: e.id });
-    }
+    if (checkAndRouteEnding()) return;
     render();
   };
 

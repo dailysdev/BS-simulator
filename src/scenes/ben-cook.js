@@ -4,14 +4,12 @@ import {
   changeMood,
   changeMoney,
   changeHealth,
-  getState,
   getStats,
   getFlag,
   setFlag,
-  setEnding,
   visit,
 } from "../state.js";
-import { matchEnding } from "../endings.js";
+import { checkAndRouteEnding } from "../scene-helpers.js";
 
 const DISH_PRICE = 20;
 const ROUNDS = 3;
@@ -179,13 +177,7 @@ export function mount(root) {
     const res = RESULTS[hits];
     if (res.health) changeHealth(res.health);
     if (res.mood) changeMood(res.mood);
-
-    const end = matchEnding(getState());
-    if (end) {
-      setEnding(end.id);
-      return goTo("ending", { id: end.id });
-    }
-
+    if (checkAndRouteEnding()) return;
     textEl.textContent = res.text;
     stageEl.innerHTML = `
       <div class="cook__result">

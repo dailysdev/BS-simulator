@@ -4,13 +4,11 @@ import {
   changeMood,
   changeMoney,
   changeHealth,
-  getState,
-  setEnding,
   getFlag,
   setFlag,
   visit,
 } from "../state.js";
-import { matchEnding } from "../endings.js";
+import { checkAndRouteEnding } from "../scene-helpers.js";
 
 const CHOICES = [
   { id: "kamen", label: "Камень" },
@@ -162,11 +160,7 @@ export function mount(root) {
       changeHealth(LOSS_HP);
       changeMood(LOSS_MOOD);
       textEl.textContent = pick(BANTER_LOSS);
-      const e = matchEnding(getState());
-      if (e) {
-        setEnding(e.id);
-        return goTo("ending", { id: e.id });
-      }
+      if (checkAndRouteEnding()) return;
       if (vladosWins >= ROUNDS_TO_WIN) {
         return showEnd(LOSS_PHRASE);
       }
@@ -186,11 +180,7 @@ export function mount(root) {
 
   const onMatchWin = () => {
     awardMatchWin();
-    const e = matchEnding(getState());
-    if (e) {
-      setEnding(e.id);
-      return goTo("ending", { id: e.id });
-    }
+    if (checkAndRouteEnding()) return;
     videoWrap.hidden = false;
     try {
       video.play();

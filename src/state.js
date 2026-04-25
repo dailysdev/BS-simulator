@@ -1,9 +1,9 @@
-const KEY = "bs-simulator:save:v2";
+import { SAVE_KEY, SAVE_VERSION, START_STATS } from "./config.js";
 
-const defaultStats = () => ({ mood: 0, money: 200, health: 5 });
+const defaultStats = () => ({ ...START_STATS });
 
 const defaultState = () => ({
-  version: 2,
+  version: SAVE_VERSION,
   createdAt: Date.now(),
   updatedAt: Date.now(),
   stats: defaultStats(),
@@ -20,10 +20,10 @@ const listeners = new Set();
 
 function load() {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    if (parsed?.version !== 2) return null;
+    if (parsed?.version !== SAVE_VERSION) return null;
     if (!parsed.stats) parsed.stats = defaultStats();
     if (!parsed.flags) parsed.flags = {};
     return parsed;
@@ -34,7 +34,7 @@ function load() {
 
 function persist() {
   state.updatedAt = Date.now();
-  localStorage.setItem(KEY, JSON.stringify(state));
+  localStorage.setItem(SAVE_KEY, JSON.stringify(state));
 }
 
 export function loadState() {
@@ -48,7 +48,7 @@ export function saveState(s) {
 }
 
 export function resetState() {
-  localStorage.removeItem(KEY);
+  localStorage.removeItem(SAVE_KEY);
   state = defaultState();
   emit();
 }

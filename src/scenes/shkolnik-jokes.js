@@ -1,8 +1,8 @@
 import { goTo } from "../sceneManager.js";
 import { getCharacter } from "../characters.js";
 import { fetchJoke } from "../jokes.js";
-import { changeMood, getState, setEnding, visit } from "../state.js";
-import { matchEnding } from "../endings.js";
+import { changeMood, visit } from "../state.js";
+import { checkAndRouteEnding } from "../scene-helpers.js";
 
 const LAUGHS = [
   "Апхапаха",
@@ -88,11 +88,9 @@ export function mount(root) {
     }
     if (e.target.closest('[data-action="read"]')) {
       changeMood(1);
-      const ending = matchEnding(getState());
-      if (ending) {
-        setEnding(ending.id);
+      if (checkAndRouteEnding()) {
         if (ac) ac.abort();
-        return goTo("ending", { id: ending.id });
+        return;
       }
       load();
     }

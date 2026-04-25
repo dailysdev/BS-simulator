@@ -1,11 +1,11 @@
 import { show as showHud, hide as hideHud } from "./hud.js";
 import { setSceneMute } from "./bgm.js";
+import { HUD_HIDDEN_SCENES, BGM_MUTED_SCENES } from "./config.js";
 
 const root = () => document.getElementById("app");
 
-const hudHiddenIn = new Set(["splash", "ending"]);
-// Scenes that bring their own soundtrack — silence the global BGM while they run.
-const bgmMutedIn = new Set(["diana-fight"]);
+const hudHiddenIn = new Set(HUD_HIDDEN_SCENES);
+const bgmMutedIn = new Set(BGM_MUTED_SCENES);
 
 let currentCleanup = null;
 

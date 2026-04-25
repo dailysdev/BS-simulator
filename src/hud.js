@@ -1,4 +1,5 @@
 import { getStats, onChange } from "./state.js";
+import { HEALTH_LOW } from "./config.js";
 
 let mounted = false;
 
@@ -39,7 +40,7 @@ export function mountHud() {
       values[key].textContent = formatStat(key, newV);
       if (newV !== oldV) flash(slots[key], newV - oldV, key);
     }
-    hud.dataset.low = s.health <= 1 ? "1" : "0";
+    hud.dataset.low = s.health <= HEALTH_LOW ? "1" : "0";
     prev = { ...s };
   };
 

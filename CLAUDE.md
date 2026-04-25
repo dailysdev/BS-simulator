@@ -5,12 +5,15 @@ A mobile-style web mini-game (static HTML/JS, no bundler). Launch with `python3 
 ## Architecture
 
 ```
-index.html              → shell (#app + global HUD)
+index.html              → shell (#app + global HUD + #bgm <audio>)
 styles.css              → all styles
-src/main.js             → bootstrap: mounts HUD, opens splash
-src/sceneManager.js     → scene router (dynamic import by name), toggles HUD
+src/main.js             → bootstrap: mounts HUD, arms BGM, opens splash
+src/config.js           → game-wide constants (save key, starting stats, thresholds, BGM)
+src/sceneManager.js     → scene router (dynamic import by name), toggles HUD + BGM
 src/state.js            → game state + emitter + persistence (localStorage)
 src/hud.js              → HUD (3 stats), single instance for the whole app
+src/bgm.js              → background music controller (singleton <audio id="bgm">)
+src/scene-helpers.js    → cross-scene helpers (currently: checkAndRouteEnding)
 src/characters.js       → character registry (id, name, role, avatar, scene, focus, action)
 src/endings.js          → endings matrix
 src/jokes.js            → jokes source (external API + local fallback)
@@ -69,20 +72,17 @@ Helpers in `state.js`:
 - `visit(characterId)` — call this in `mount` of every character-action scene. Returns `{ isNewVisit, prev }`: `isNewVisit=true` when the previous visit was to a different character. Scenes use this to reset per-visit cooldown flags.
 - `onChange(fn)` — subscribe (used by HUD).
 
-After any stat change a scene **must** check endings:
+After any stat change a scene **must** check endings via the shared helper:
 
 ```js
-import { matchEnding } from "../endings.js";
-import { getState, setEnding } from "../state.js";
-import { goTo } from "../sceneManager.js";
+import { changeMood } from "../state.js";
+import { checkAndRouteEnding } from "../scene-helpers.js";
 
 changeMood(1);
-const e = matchEnding(getState());
-if (e) {
-  setEnding(e.id);
-  return goTo("ending", { id: e.id });
-}
+if (checkAndRouteEnding()) return; // bail — scene was unmounted into the ending
 ```
+
+`checkAndRouteEnding()` runs `matchEnding(getState())`, calls `setEnding`, and routes to the `ending` scene if a rule matched. It returns `true` when it navigated, `false` otherwise.
 
 ## Endings matrix
 
@@ -151,7 +151,7 @@ Mechanic details live next to each character in `references/charakters/<id>/desc
 
 1. Create `src/scenes/<id>-<action>.js` following the scene contract.
 2. Add `action: "<id>-<action>"` on the character in `characters.js`.
-3. Inside the scene, call `visit("<id>")` and `change*(n)`, then check `matchEnding` → `goTo("ending", ...)`.
+3. Inside the scene, call `visit("<id>")` and `change*(n)`, then `if (checkAndRouteEnding()) return;`.
 4. Document the mechanic in `references/charakters/<id>/description.md`.
 
 `sceneManager` requires no edit — scenes are resolved by filename.

@@ -6,11 +6,9 @@ import {
   changeHealth,
   getFlag,
   setFlag,
-  getState,
-  setEnding,
   visit,
 } from "../state.js";
-import { matchEnding } from "../endings.js";
+import { checkAndRouteEnding } from "../scene-helpers.js";
 
 const MAX_HP = 100;
 
@@ -270,11 +268,7 @@ export function mount(root) {
       changeHealth(LOSS_HEALTH);
     }
 
-    const end = matchEnding(getState());
-    if (end) {
-      setEnding(end.id);
-      return goTo("ending", { id: end.id });
-    }
+    if (checkAndRouteEnding()) return;
     setFlag("deathCause", null);
     showEndButtons(win);
   }
